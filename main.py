@@ -6,7 +6,7 @@ import json
 import os
 from datetime import datetime
 
-class TaskManagerApp(App):
+class xDo(App):
     """A simple task manager application built with Textual."""
     
     TITLE = "xDo - A simple task manager"
@@ -18,6 +18,13 @@ class TaskManagerApp(App):
     }
     
     #controls {
+        height: auto;
+        margin: 1 1;
+        background: #333333;
+        padding: 1;
+    }
+    
+    #search-container {
         height: auto;
         margin: 1 1;
         background: #333333;
@@ -39,6 +46,7 @@ class TaskManagerApp(App):
         ("a", "add_task", "Add Task"),
         ("d", "delete_task", "Delete Task"),
         ("c", "toggle_complete", "Toggle Complete"),
+        ("s", "focus_search", "Search"),
     ]
     
     def __init__(self):
@@ -48,6 +56,12 @@ class TaskManagerApp(App):
     
     def compose(self) -> ComposeResult:
         yield Header()
+        
+        with Container(id="search-container"):
+            yield Static("Search Tasks:")
+            yield Input(placeholder="Search by task title", id="search-input")
+            yield Button("Clear Search", id="clear-search-button")
+            
         yield DataTable(id="task-list")
         
         with Container(id="controls"):
@@ -70,7 +84,13 @@ class TaskManagerApp(App):
         table = self.query_one(DataTable)
         table.clear(columns=False)
         
+        search_text = self.query_one("#search-input").value.lower()
+        
         for task in self.tasks:
+            # Skip tasks that don't match the search query
+            if search_text and search_text not in task["title"].lower():
+                continue
+                
             status = "✓" if task["completed"] else "○"
             status_cell = (status, "completed" if task["completed"] else "")
             task_cell = (task["title"], "completed" if task["completed"] else "")
@@ -124,6 +144,26 @@ class TaskManagerApp(App):
     def handle_toggle_button(self) -> None:
         self.action_toggle_complete()
     
+    @on(Input.Submitted, "#search-input")
+    def handle_search_submitted(self) -> None:
+        """Update the task list when search is submitted."""
+        self.update_task_list()
+    
+    @on(Input.Changed, "#search-input")
+    def handle_search_changed(self) -> None:
+        """Update the task list as the user types in the search field."""
+        self.update_task_list()
+    
+    @on(Button.Pressed, "#clear-search-button")
+    def handle_clear_search(self) -> None:
+        """Clear the search field and show all tasks."""
+        self.query_one("#search-input").value = ""
+        self.update_task_list()
+    
+    def action_focus_search(self) -> None:
+        """Focus the search input field."""
+        self.query_one("#search-input").focus()
+    
     @on(Input.Submitted)
     def handle_input_submitted(self) -> None:
         self.action_add_task()
@@ -145,5 +185,5 @@ class TaskManagerApp(App):
 
 
 if __name__ == "__main__":
-    app = TaskManagerApp()
+    app = xDo()
     app.run() 
