@@ -65,11 +65,11 @@ class xDo(App):
         yield DataTable(id="task-list")
         
         with Container(id="controls"):
-            yield Static("New Task:")
-            yield Input(placeholder="Enter task here", id="new-task")
+            # yield Static("New Task:")
+            yield Input(placeholder="Task", id="new-task")
             yield Button("Add", id="add-button", variant="primary")
             yield Button("Mark Complete/Incomplete", id="toggle-button")
-            yield Button("Delete", id="delete-button", variant="error")
+            yield Button("Remove", id="delete-button", variant="error")
         
         yield Footer()
     
