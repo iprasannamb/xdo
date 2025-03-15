@@ -6,7 +6,7 @@ import json
 import os
 from datetime import datetime
 
-class xDo(App):
+class index(App):
     """A simple task manager application built with Textual."""
     
     TITLE = "xDo - A simple task manager"
@@ -185,5 +185,5 @@ class xDo(App):
 
 
 if __name__ == "__main__":
-    app = xDo()
+    app = index()
     app.run() 
